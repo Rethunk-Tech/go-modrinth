@@ -6,6 +6,8 @@ Notable changes to `go-modrinth`. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-08
+
 ### Added
 
 - `LatestByHash` takes a `versionTypes` filter, sent as `version_types`, so an update lookup can be kept to release
@@ -22,5 +24,6 @@ Notable changes to `go-modrinth`. The format follows
 - `ValidID` and `PageURL` for a project id or slug, `MaxPageSize` and `ProjectsBatch` for paging and batching, and
   the `Index` sort constants.
 
-[Unreleased]: https://github.com/Rethunk-Tech/go-modrinth/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Rethunk-Tech/go-modrinth/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Rethunk-Tech/go-modrinth/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Rethunk-Tech/go-modrinth/releases/tag/v0.1.0
