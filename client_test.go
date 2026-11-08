@@ -312,7 +312,9 @@ func TestCrossOriginRedirectIsRefused(t *testing.T) {
 	}))
 	t.Cleanup(elsewhere.Close)
 	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, elsewhere.URL+r.URL.Path, http.StatusFound)
+		// A raw header, not http.Redirect: the redirect is the point of the test, and its target is a test server.
+		w.Header().Set("Location", elsewhere.URL+r.URL.Path)
+		w.WriteHeader(http.StatusFound)
 	})
 	if _, err := c.Categories(t.Context()); err == nil {
 		t.Fatal("a cross-origin redirect was followed")

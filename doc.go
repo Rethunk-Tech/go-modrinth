@@ -1,2 +1,3 @@
-// Package modrinth a client for the Modrinth API: search, project and version metadata, and file downloads.
+// Package modrinth is a client for the public Modrinth v2 API: search, projects, versions, files with their digests,
+// dependencies and categories.
 package modrinth
