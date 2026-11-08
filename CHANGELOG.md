@@ -6,6 +6,8 @@ Notable changes to `go-modrinth`. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-08
+
 ### Added
 
 - `Client` over the Modrinth v2 API: `Search` with facets, index and offset paging; `Project`, `Projects` and
@@ -15,4 +17,5 @@ Notable changes to `go-modrinth`. The format follows
 - `ValidID` and `PageURL` for a project id or slug, `MaxPageSize` and `ProjectsBatch` for paging and batching, and
   the `Index` sort constants.
 
-[Unreleased]: https://github.com/Rethunk-Tech/go-modrinth/commits/main
+[Unreleased]: https://github.com/Rethunk-Tech/go-modrinth/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Rethunk-Tech/go-modrinth/releases/tag/v0.1.0
