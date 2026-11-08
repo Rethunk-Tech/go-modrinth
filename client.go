@@ -162,16 +162,21 @@ func (c *Client) VersionsByHash(ctx context.Context, algorithm string, hashes []
 	return out, err
 }
 
-// LatestByHash finds the newest version of each file that matches the loaders and game versions, keyed by the hash
-// given. A file with no newer version is absent from the map.
-func (c *Client) LatestByHash(ctx context.Context, algorithm string, hashes, loaders, gameVersions []string) (map[string]Version, error) {
+// LatestByHash finds the newest version of each file that matches the loaders, game versions and version types,
+// keyed by the hash given. A file with no newer version is absent from the map.
+func (c *Client) LatestByHash(ctx context.Context, algorithm string, hashes, loaders, gameVersions, versionTypes []string) (map[string]Version, error) {
 	var out map[string]Version
 	err := c.post(ctx, "/version_files/update", struct {
 		Hashes       []string `json:"hashes"`
 		Algorithm    string   `json:"algorithm"`
 		Loaders      []string `json:"loaders"`
 		GameVersions []string `json:"game_versions"`
-	}{Hashes: orEmpty(hashes), Algorithm: algorithm, Loaders: orEmpty(loaders), GameVersions: orEmpty(gameVersions)}, &out)
+		// An empty version_types is left out rather than sent as [], which the API could read as admitting no type.
+		VersionTypes []string `json:"version_types,omitempty"`
+	}{
+		Hashes: orEmpty(hashes), Algorithm: algorithm, Loaders: orEmpty(loaders),
+		GameVersions: orEmpty(gameVersions), VersionTypes: versionTypes,
+	}, &out)
 	return out, err
 }
 

@@ -246,12 +246,40 @@ func TestLatestByHashSendsLoadersAndGameVersions(t *testing.T) {
 		}
 		_, _ = w.Write([]byte(`{"ab":` + sodiumVersion + `}`))
 	})
-	got, err := c.LatestByHash(t.Context(), "sha1", []string{"ab"}, []string{"fabric", "quilt"}, []string{"1.21"})
+	got, err := c.LatestByHash(t.Context(), "sha1", []string{"ab"}, []string{"fabric", "quilt"}, []string{"1.21"}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if v, ok := got["ab"]; !ok || v.ID != "v2" {
 		t.Fatalf("%+v", got)
+	}
+}
+
+// The version types narrow an update to the channels a caller accepts, and an empty filter is left out rather than
+// sent as an empty array the API could read as admitting no type.
+func TestLatestByHashSendsVersionTypes(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		types []string
+		want  string
+	}{
+		{[]string{"release", "beta"}, `,"version_types":["release","beta"]`},
+		{nil, ``},
+	} {
+		c := fake(t, func(w http.ResponseWriter, r *http.Request) {
+			raw, err := io.ReadAll(r.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := `{"hashes":["ab"],"algorithm":"sha512","loaders":["fabric"],"game_versions":["1.21"]` + tc.want + `}`
+			if string(raw) != want {
+				t.Errorf("body %s, want %s", raw, want)
+			}
+			_, _ = w.Write([]byte(`{}`))
+		})
+		if _, err := c.LatestByHash(t.Context(), "sha512", []string{"ab"}, []string{"fabric"}, []string{"1.21"}, tc.types); err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 
@@ -268,7 +296,7 @@ func TestLatestByHashSendsEmptyArraysRatherThanNull(t *testing.T) {
 		}
 		_, _ = w.Write([]byte(`{}`))
 	})
-	if _, err := c.LatestByHash(t.Context(), "sha512", nil, nil, nil); err != nil {
+	if _, err := c.LatestByHash(t.Context(), "sha512", nil, nil, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 }

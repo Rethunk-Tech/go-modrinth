@@ -6,6 +6,11 @@ Notable changes to `go-modrinth`. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `LatestByHash` takes a `versionTypes` filter, sent as `version_types`, so an update lookup can be kept to release
+  channels; an empty filter sends no field.
+
 ## [0.1.0] - 2026-11-08
 
 ### Added
