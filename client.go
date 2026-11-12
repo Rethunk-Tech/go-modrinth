@@ -93,7 +93,7 @@ func (c *Client) Search(ctx context.Context, q SearchQuery) (SearchResult, error
 		params.Set("facets", string(raw))
 	}
 	params.Set("index", cmp.Or(q.Index, IndexRelevance))
-	params.Set("limit", strconv.Itoa(min(cmp.Or(q.Limit, MaxPageSize), MaxPageSize)))
+	params.Set("limit", strconv.Itoa(min(cmp.Or(max(q.Limit, 0), MaxPageSize), MaxPageSize)))
 	params.Set("offset", strconv.Itoa(max(q.Offset, 0)))
 	var out SearchResult
 	err := c.get(ctx, "/search", params, &out)

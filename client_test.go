@@ -88,6 +88,19 @@ func TestSearchDefaultsToTheLargestPageAndRelevance(t *testing.T) {
 	}
 }
 
+func TestSearchTreatsANegativeLimitAsTheLargestPage(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("limit") != "100" {
+			t.Errorf("limit %q", r.URL.Query().Get("limit"))
+		}
+		_, _ = w.Write([]byte(`{"total_hits":0,"hits":[]}`))
+	})
+	if _, err := c.Search(t.Context(), SearchQuery{Limit: -1}); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestProjectReadsOneByIDOrSlug(t *testing.T) {
 	t.Parallel()
 	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
