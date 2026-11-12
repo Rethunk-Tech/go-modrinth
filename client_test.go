@@ -123,6 +123,19 @@ func TestProjectsNamesEveryIDInOneArray(t *testing.T) {
 	}
 }
 
+func TestProjectsSendsEmptyArrayRatherThanNull(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("ids") != "[]" {
+			t.Errorf("ids %q", r.URL.Query().Get("ids"))
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := c.Projects(t.Context(), nil); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestProjectVersionsSendsLoadersAndGameVersions(t *testing.T) {
 	t.Parallel()
 	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
@@ -169,6 +182,19 @@ func TestVersionsReadsByID(t *testing.T) {
 	}
 	if len(got) != 1 || got[0].ID != "v2" {
 		t.Fatalf("%+v", got)
+	}
+}
+
+func TestVersionsSendsEmptyArrayRatherThanNull(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("ids") != "[]" {
+			t.Errorf("ids %q", r.URL.Query().Get("ids"))
+		}
+		_, _ = w.Write([]byte(`[]`))
+	})
+	if _, err := c.Versions(t.Context(), nil); err != nil {
+		t.Fatal(err)
 	}
 }
 

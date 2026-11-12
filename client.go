@@ -109,7 +109,7 @@ func (c *Client) Project(ctx context.Context, idOrSlug string) (Project, error) 
 
 // Projects reads many projects in one request; name at most ProjectsBatch ids.
 func (c *Client) Projects(ctx context.Context, ids []string) ([]Project, error) {
-	raw, err := json.Marshal(ids)
+	raw, err := json.Marshal(orEmpty(ids))
 	if err != nil {
 		return nil, fmt.Errorf("modrinth: %w", err)
 	}
@@ -143,7 +143,7 @@ func (c *Client) ProjectVersions(ctx context.Context, project string, loaders, g
 
 // Versions reads many versions by id in one request.
 func (c *Client) Versions(ctx context.Context, ids []string) ([]Version, error) {
-	raw, err := json.Marshal(ids)
+	raw, err := json.Marshal(orEmpty(ids))
 	if err != nil {
 		return nil, fmt.Errorf("modrinth: %w", err)
 	}
