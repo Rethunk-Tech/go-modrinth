@@ -96,7 +96,7 @@ type Category struct {
 var idPattern = regexp.MustCompile(`^[A-Za-z0-9._-]{1,64}$`)
 
 // ValidID reports whether id is a project id or slug, so it is safe to put in a request path.
-func ValidID(id string) bool { return idPattern.MatchString(id) }
+func ValidID(id string) bool { return id != "." && id != ".." && idPattern.MatchString(id) }
 
 // PageURL is the project's page address; projectType is the URL segment such as "mod" or "modpack", and slug is the
 // project's slug or id.

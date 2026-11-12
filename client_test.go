@@ -419,7 +419,7 @@ func TestValidIDRefusesPathTricks(t *testing.T) {
 			t.Errorf("%q refused", id)
 		}
 	}
-	for _, id := range []string{"", "../etc", "a/b", "a b", "a?b", strings.Repeat("a", 65)} {
+	for _, id := range []string{"", ".", "..", "../etc", "a/b", "a b", "a?b", strings.Repeat("a", 65)} {
 		if ValidID(id) {
 			t.Errorf("%q accepted", id)
 		}

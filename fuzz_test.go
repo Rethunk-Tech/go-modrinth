@@ -11,12 +11,12 @@ import (
 func FuzzValidID(f *testing.F) {
 	for _, id := range []string{
 		"AANobbMI", "sodium", "my.mod_1-2", strings.Repeat("a", 64),
-		"", "../etc", "a/b", "a b", "a?b", strings.Repeat("a", 65),
+		"", ".", "..", "../etc", "a/b", "a b", "a?b", strings.Repeat("a", 65),
 	} {
 		f.Add(id)
 	}
 	f.Fuzz(func(t *testing.T, id string) {
-		want := len(id) >= 1 && len(id) <= 64
+		want := id != "." && id != ".." && len(id) >= 1 && len(id) <= 64
 		for i := 0; i < len(id) && want; i++ {
 			c := id[i]
 			want = c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.' || c == '_' || c == '-'
