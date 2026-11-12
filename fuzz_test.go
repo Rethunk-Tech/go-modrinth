@@ -55,21 +55,67 @@ func FuzzProject(f *testing.F) {
 	f.Add([]byte(sodiumProject))
 	f.Add([]byte(`{"id":"AANobbMI","slug":"sodium","status":"archived"}`))
 	f.Add([]byte(`{}`))
+	fuzzJSON[Project](f)
+}
+
+func FuzzVersion(f *testing.F) {
+	f.Add([]byte(sodiumVersion))
+	f.Add([]byte(`{"files":[],"dependencies":[]}`))
+	f.Add([]byte(`{}`))
+	fuzzJSON[Version](f)
+}
+
+func FuzzSearchResult(f *testing.F) {
+	f.Add([]byte(`{"total_hits":41,"hits":[{"project_id":"AANobbMI","slug":"sodium","title":"Sodium",
+"description":"fast","author":"jelly","icon_url":"https://cdn/i.png","downloads":9,"follows":3,
+"date_modified":"2026-09-20T00:00:00Z","versions":["v1","v2"],"latest_version":"v2"}]}`))
+	f.Add([]byte(`{"total_hits":0,"hits":[]}`))
+	f.Add([]byte(`{}`))
+	fuzzJSON[SearchResult](f)
+}
+
+func FuzzCategory(f *testing.F) {
+	f.Add([]byte(`{"name":"fabric","project_type":"mod"}`))
+	f.Add([]byte(`{"name":"adventure","project_type":"modpack"}`))
+	f.Add([]byte(`{}`))
+	fuzzJSON[Category](f)
+}
+
+func FuzzProjects(f *testing.F) {
+	f.Add([]byte(`[` + sodiumProject + `]`))
+	f.Add([]byte(`[{"id":"AANobbMI","slug":"sodium","status":"archived"},{"id":"P1"}]`))
+	f.Add([]byte(`[]`))
+	fuzzJSON[[]Project](f)
+}
+
+func FuzzVersions(f *testing.F) {
+	f.Add([]byte(`[` + sodiumVersion + `]`))
+	f.Add([]byte(`[]`))
+	fuzzJSON[[]Version](f)
+}
+
+func FuzzVersionsByHash(f *testing.F) {
+	f.Add([]byte(`{"ab":` + sodiumVersion + `}`))
+	f.Add([]byte(`{}`))
+	fuzzJSON[map[string]Version](f)
+}
+
+func fuzzJSON[T any](f *testing.F) {
 	f.Fuzz(func(t *testing.T, raw []byte) {
-		var p Project
-		if err := json.Unmarshal(raw, &p); err != nil {
+		var v T
+		if err := json.Unmarshal(raw, &v); err != nil {
 			return
 		}
-		enc, err := json.Marshal(p)
+		enc, err := json.Marshal(v)
 		if err != nil {
 			t.Fatal(err)
 		}
-		var p2 Project
-		if err := json.Unmarshal(enc, &p2); err != nil {
+		var v2 T
+		if err := json.Unmarshal(enc, &v2); err != nil {
 			t.Fatal(err)
 		}
-		if !reflect.DeepEqual(p, p2) {
-			t.Fatalf("%+v vs %+v", p, p2)
+		if !reflect.DeepEqual(v, v2) {
+			t.Fatalf("%+v vs %+v", v, v2)
 		}
 	})
 }
