@@ -103,7 +103,10 @@ func (c *Client) Search(ctx context.Context, q SearchQuery) (SearchResult, error
 // Project reads one project by id or slug.
 func (c *Client) Project(ctx context.Context, idOrSlug string) (Project, error) {
 	var out Project
-	err := c.get(ctx, "/project/"+url.PathEscape(idOrSlug), nil, &out)
+	if !ValidID(idOrSlug) {
+		return out, fmt.Errorf("modrinth: invalid project id %q", idOrSlug)
+	}
+	err := c.get(ctx, "/project/"+idOrSlug, nil, &out)
 	return out, err
 }
 
@@ -120,6 +123,9 @@ func (c *Client) Projects(ctx context.Context, ids []string) ([]Project, error) 
 
 // ProjectVersions lists a project's versions, newest first, kept to loaders and game versions when either is named.
 func (c *Client) ProjectVersions(ctx context.Context, project string, loaders, gameVersions []string) ([]Version, error) {
+	if !ValidID(project) {
+		return nil, fmt.Errorf("modrinth: invalid project id %q", project)
+	}
 	var params url.Values
 	for _, f := range []struct {
 		name  string
@@ -137,7 +143,7 @@ func (c *Client) ProjectVersions(ctx context.Context, project string, loaders, g
 		}
 	}
 	var out []Version
-	err := c.get(ctx, "/project/"+url.PathEscape(project)+"/version", params, &out)
+	err := c.get(ctx, "/project/"+project+"/version", params, &out)
 	return out, err
 }
 

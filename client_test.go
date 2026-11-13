@@ -435,3 +435,17 @@ func TestPageURLNamesTheTypeAndSlug(t *testing.T) {
 		t.Fatalf("%q", got)
 	}
 }
+
+// An id of "." or ".." would let a server or proxy resolve the request path onto another endpoint.
+func TestProjectRefusesIDsThatEscapeThePath(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(http.ResponseWriter, *http.Request) { t.Error("request must not be sent") })
+	for _, id := range []string{"", ".", "..", "a/b"} {
+		if _, err := c.Project(t.Context(), id); err == nil {
+			t.Errorf("Project(%q) succeeded", id)
+		}
+		if _, err := c.ProjectVersions(t.Context(), id, nil, nil); err == nil {
+			t.Errorf("ProjectVersions(%q) succeeded", id)
+		}
+	}
+}
