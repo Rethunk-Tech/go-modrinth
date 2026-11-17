@@ -81,6 +81,12 @@ func FuzzCategory(f *testing.F) {
 	fuzzJSON[Category](f)
 }
 
+func FuzzCategories(f *testing.F) {
+	f.Add([]byte(`[{"name":"fabric","project_type":"mod"},{"name":"adventure","project_type":"modpack"}]`))
+	f.Add([]byte(`[]`))
+	fuzzJSON[[]Category](f)
+}
+
 func FuzzProjects(f *testing.F) {
 	f.Add([]byte(`[` + sodiumProject + `]`))
 	f.Add([]byte(`[{"id":"AANobbMI","slug":"sodium","status":"archived"},{"id":"P1"}]`))
