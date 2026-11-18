@@ -391,18 +391,17 @@ func TestANonJSONAnswerIsADecodeError(t *testing.T) {
 	if err == nil {
 		t.Fatal("a non-JSON answer was accepted")
 	}
-	var syn *json.SyntaxError
-	if !errors.As(err, &syn) {
+	if _, ok := errors.AsType[*json.SyntaxError](err); !ok {
 		t.Fatalf("%v", err)
 	}
 }
 
-// A nil context cannot build a request, so the call fails without contacting the API.
-func TestANilContextIsRefusedBeforeTheRequest(t *testing.T) {
+// A base URL that cannot be parsed is refused before any request, so a bad Config cannot hit the network.
+func TestAMalformedBaseURLIsRefusedBeforeTheRequest(t *testing.T) {
 	t.Parallel()
-	c := fake(t, func(http.ResponseWriter, *http.Request) { t.Error("request must not be sent") })
-	if _, err := c.Categories(nil); err == nil {
-		t.Fatal("a nil context was accepted")
+	c := New(Config{BaseURL: "http://[", UserAgent: testAgent})
+	if _, err := c.Categories(t.Context()); err == nil {
+		t.Fatal("a malformed base URL was accepted")
 	}
 }
 
