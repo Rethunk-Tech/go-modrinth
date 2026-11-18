@@ -181,6 +181,30 @@ func TestProjectVersionsSendsNoFilterWhenNoneGiven(t *testing.T) {
 	}
 }
 
+// A named loader or game-version list is the only filter sent, so the unnamed one cannot be read as [].
+func TestProjectVersionsOmitsTheFilterThatWasNotNamed(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		loaders, games []string
+		wantKey, want  string
+		absent         string
+	}{
+		{[]string{"fabric"}, nil, "loaders", `["fabric"]`, "game_versions"},
+		{nil, []string{"1.21"}, "game_versions", `["1.21"]`, "loaders"},
+	} {
+		c := fake(t, func(w http.ResponseWriter, r *http.Request) {
+			q := r.URL.Query()
+			if q.Get(tc.wantKey) != tc.want || q.Has(tc.absent) {
+				t.Errorf("params %v", q)
+			}
+			_, _ = w.Write([]byte(`[]`))
+		})
+		if _, err := c.ProjectVersions(t.Context(), "AANobbMI", tc.loaders, tc.games); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
 func TestVersionsReadsByID(t *testing.T) {
 	t.Parallel()
 	c := fake(t, func(w http.ResponseWriter, r *http.Request) {
@@ -354,6 +378,31 @@ func TestCategoriesListsEveryTag(t *testing.T) {
 	}
 	if len(got) != 2 || got[0].Name != "fabric" || got[1].ProjectType != "modpack" {
 		t.Fatalf("%+v", got)
+	}
+}
+
+// A 2xx body that is not JSON is a decode error, so a hostile page cannot be treated as a result.
+func TestANonJSONAnswerIsADecodeError(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte("not json"))
+	})
+	_, err := c.Categories(t.Context())
+	if err == nil {
+		t.Fatal("a non-JSON answer was accepted")
+	}
+	var syn *json.SyntaxError
+	if !errors.As(err, &syn) {
+		t.Fatalf("%v", err)
+	}
+}
+
+// A nil context cannot build a request, so the call fails without contacting the API.
+func TestANilContextIsRefusedBeforeTheRequest(t *testing.T) {
+	t.Parallel()
+	c := fake(t, func(http.ResponseWriter, *http.Request) { t.Error("request must not be sent") })
+	if _, err := c.Categories(nil); err == nil {
+		t.Fatal("a nil context was accepted")
 	}
 }
 
