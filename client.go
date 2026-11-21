@@ -223,18 +223,10 @@ func (c *Client) do(ctx context.Context, method, path string, params url.Values,
 	if c.agent != "" {
 		req.Header.Set("User-Agent", c.agent)
 	}
-	req.Header.Set("Accept", "application/json")
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	raw, err := httpkit.DoCapped(c.hc, req, maxBody, nil)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(raw, out); err != nil {
-		return fmt.Errorf("modrinth: %w", err)
-	}
-	return nil
+	return httpkit.DoJSON(c.hc, req, out, httpkit.JSONOptions{Limit: maxBody})
 }
 
 // orEmpty is a filter the API requires as an array, which a nil slice would send as null.
