@@ -6,6 +6,10 @@ Notable changes to `go-modrinth`. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Requests go through `httpkit.DoJSON`, so a 429 is a `*httpkit.RateLimitError` carrying its Retry-After reset.
+
 ### Fixed
 
 - Project ids that are empty, `.` or `..` are refused before the path is built, and `ValidID` rejects `.` and `..`.
