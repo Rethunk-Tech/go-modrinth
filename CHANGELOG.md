@@ -6,6 +6,12 @@ Notable changes to `go-modrinth`. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Project ids that are empty, `.` or `..` are refused before the path is built, and `ValidID` rejects `.` and `..`.
+- A negative search `Limit` is clamped before the API sees it.
+- Nil id lists are sent as `[]`, not `null`.
+
 ## [0.2.0] - 2026-11-08
 
 ### Added
